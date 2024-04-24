@@ -1,8 +1,9 @@
 #![allow(dead_code, unused)]
-// use serde::{Serialize, Deserialize}
-// use serde_json;
 // use ring::digest;
 
+use core::hash;
+
+use sha2::{Digest, Sha256, Sha256VarCore};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -29,6 +30,21 @@ impl Tx{
             tx_input: vin,
             tx_output: vout,
         }
+    }
+
+    pub fn get_tx_hash(&self) -> String{
+        let serialized_tx = format!("{:?}", self);
+        let mut hasher = Sha256::new();
+
+        hasher.update(serialized_tx.as_bytes());
+
+        let result = hasher.finalize();
+
+        let hash_string = result.iter().map(|byte| format!("{:02x}", byte)).collect::<String>();
+
+        println!("{}", serialized_tx);
+
+        return hash_string;
     }
 
     pub fn get_tx_size_in_bits(&self) -> u64 {

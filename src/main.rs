@@ -1,5 +1,6 @@
 #![allow(dead_code, unused)]
 mod block;
+mod transactions;
 use block::block_header::BlockHeader;
 use chrono::Utc;
 use mining_challenge::{read_mempool, read_tx_from_file};
