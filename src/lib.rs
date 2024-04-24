@@ -16,18 +16,27 @@ pub fn read_mempool(path: &str){
     
     let tx = read_tx_from_file("/home/gabriel/projects/bitcoin-mining-challenge/mempool/0.json");
 
-    // for file in files{
-    //     let file_path = path.to_string() + &file;
-    //     // let file: File = File::create(&file_path).unwrap();
-    //     // let file_size = fs::metadata(&file_path).expect("Falha ao ler o arquivo");
-    //     // file.sync_all();
-    //     // println!("Size: {} File: {}", file);
-    //     let transaction_json: Tx = read_tx_from_file(file_path);
+    let mut mempool: Vec<Tx> = vec![];
 
-    //     // let tx: Tx = convert_json_tx_to_struct(transaction_json);
-    //     println!("{:?}", transaction_json.get_tx_size());
+    for file in files{
+        let file_path = path.to_string() + &file;
 
-    // }
+        let transaction: Tx = read_tx_from_file(&file_path);
+
+        mempool.push(transaction);
+    }
+
+    println!("Before sorting");
+    println!("Fee:{}", mempool[0].calculate_tx_fee());
+    println!("Fee:{}", mempool[1].calculate_tx_fee());
+    println!("Fee:{}", mempool[2].calculate_tx_fee());
+
+    mempool.sort_by_key(|tx| tx.calculate_tx_fee());
+    mempool.reverse();
+    println!("After sorting");
+    println!("Fee:{}", mempool[0].calculate_tx_fee());
+    println!("Fee:{}", mempool[1].calculate_tx_fee());
+    println!("Fee:{}", mempool[2].calculate_tx_fee());
     // is_coinbase(tx_in_json);
 }
 
@@ -44,6 +53,10 @@ pub fn read_tx_from_file(file_path: &str) -> Tx {
             // .expect("Error parsing file content to JSON");
 
     return tx_in_json;
+}
+
+pub fn sort_txs_by_fee(mut txs: Vec<Tx>){
+    txs.sort_by_key(|tx| tx.calculate_tx_fee());
 }
 
 // TODO: this function is with a problem that all the strings are coming with "\".......\""

@@ -32,6 +32,20 @@ impl Tx{
         }
     }
 
+    pub fn calculate_tx_fee(&self) -> u64 {
+        let mut inputs_total: u64 = 0;
+        let mut outputs_total: u64 = 0;
+        
+        for inputs in &self.tx_input{
+            inputs_total += inputs.prevout.value;
+        }
+        for outputs in &self.tx_output{
+            outputs_total += outputs.value;
+        }
+
+        return inputs_total - outputs_total;
+    }
+
     pub fn get_tx_hash(&self) -> String{
         let serialized_tx = format!("{:?}", self);
         let mut hasher = Sha256::new();
