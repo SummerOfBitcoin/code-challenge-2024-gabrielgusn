@@ -55,10 +55,6 @@ pub fn read_tx_from_file(file_path: &str) -> Tx {
     return tx_in_json;
 }
 
-pub fn sort_txs_by_fee(mut txs: Vec<Tx>){
-    txs.sort_by_key(|tx| tx.calculate_tx_fee());
-}
-
 // TODO: this function is with a problem that all the strings are coming with "\".......\""
 // pub fn convert_json_tx_to_struct(tx_json: serde_json::Value) -> Tx {
 //     let tx_vin = &tx_json["vin"][0];

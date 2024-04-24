@@ -28,14 +28,32 @@ fn main() {
     println!("1st Block Hash: {}", first_block_header.get_block_header_sha256sum());
     println!("Size of Block Header: {}", std::mem::size_of::<BlockHeader>());
 
-    let data: &str = "texto 1234";
+    let mut block_vec: Vec<BlockHeader> = vec![];
+
+    block_vec.push(first_block_header);
+
+    for i in 0..10{
+        println!("{}", i);
+        let block_header = BlockHeader::new(block_vec[i].get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 0);
+        block_vec.push(block_header);
+    }
+
+    for block in &block_vec {
+        println!("{}", block);
+    }
 
     let mut nonce: u64 = 0_u64;
 
-    let teste_string: String = String::from("teste");
-
-    println!("{}", teste_string.len());
-    
+    // for mut block in block_vec{
+        loop {
+            if block_vec[0].get_block_header_sha256sum() < block_vec[0].target_hash {
+                println!("Found the nonce for the target Hash! It is: {} and you can attach this block to the blockchain\n\t Block Hash is: {}", block_vec[0].nonce, block_vec[0].get_block_header_sha256sum());
+                break
+            }
+            println!("Not yet! ({})", block_vec[0].get_block_header_sha256sum());
+            block_vec[0].nonce += 1;
+        }
+    // }
 
     // loop{
 
