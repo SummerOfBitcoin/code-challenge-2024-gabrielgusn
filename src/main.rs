@@ -2,10 +2,10 @@
 mod block;
 mod transactions;
 use block::block_header::BlockHeader;
+use block::block::Block;
 use chrono::Utc;
 use mining_challenge::{read_mempool, read_tx_from_file};
 use ring::digest::{Context, Digest, SHA256};
-use sha2::digest::block_buffer::Block;
 use std::fmt::Write;
 // use hex_literal::hex;
 use std::fs;
@@ -18,41 +18,36 @@ fn main() {
 
     // let mut hasher = Sha256::new();
     let first_block_header: BlockHeader = BlockHeader::new(String::from("00000000000000000000000000000000"), String::from("00000000000000000000000000000000"), Utc::now(), 128);
-    let second_block_header: BlockHeader = BlockHeader::new(first_block_header.get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 256);
+    let block = Block::new(first_block_header, vec![]);
 
-    println!("=================================");
-    println!("{}", first_block_header);
-    println!("=================================");
-    println!("{}", second_block_header);
-    println!("=================================");
-    println!("1st Block Hash: {}", first_block_header.get_block_header_sha256sum());
-    println!("Size of Block Header: {}", std::mem::size_of::<BlockHeader>());
+    // println!("=================================");
+    // println!("{}", first_block_header);
+    // println!("=================================");
+    // println!("1st Block Hash: {}", first_block_header.get_block_header_sha256sum());
+    // println!("Size of Block Header: {}", std::mem::size_of::<BlockHeader>());
 
-    let mut block_vec: Vec<BlockHeader> = vec![];
+    let mut block_vec: Vec<Block> = vec![];
 
-    block_vec.push(first_block_header);
+    block_vec.push(block);
 
     for i in 0..10{
-        println!("{}", i);
-        let block_header = BlockHeader::new(block_vec[i].get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 0);
-        block_vec.push(block_header);
+
+        println!("Generating Block {}", i+1);
+
+        let block_header = BlockHeader::new(block_vec[i].block_header.get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 0);
+
+        let new_block = Block::new(block_header, vec![]);
+        block_vec.push(new_block);
     }
 
-    for block in &block_vec {
+
+    for mut block in block_vec {
         println!("{}", block);
+        block.proof_of_work()
     }
 
-    let mut nonce: u64 = 0_u64;
-
-    // for mut block in block_vec{
-        loop {
-            if block_vec[0].get_block_header_sha256sum() < block_vec[0].target_hash {
-                println!("Found the nonce for the target Hash! It is: {} and you can attach this block to the blockchain\n\t Block Hash is: {}", block_vec[0].nonce, block_vec[0].get_block_header_sha256sum());
-                break
-            }
-            println!("Not yet! ({})", block_vec[0].get_block_header_sha256sum());
-            block_vec[0].nonce += 1;
-        }
+    // for mut block in block_veu ec{
+        
     // }
 
     // loop{
