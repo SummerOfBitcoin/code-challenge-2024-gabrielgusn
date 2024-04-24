@@ -5,6 +5,7 @@ use block::block_header::BlockHeader;
 use chrono::Utc;
 use mining_challenge::{read_mempool, read_tx_from_file};
 use ring::digest::{Context, Digest, SHA256};
+use sha2::digest::block_buffer::Block;
 use std::fmt::Write;
 // use hex_literal::hex;
 use std::fs;
@@ -17,9 +18,14 @@ fn main() {
 
     // let mut hasher = Sha256::new();
     let first_block_header: BlockHeader = BlockHeader::new(String::from("00000000000000000000000000000000"), String::from("00000000000000000000000000000000"), Utc::now(), 128);
+    let second_block_header: BlockHeader = BlockHeader::new(first_block_header.get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 256);
 
+    println!("=================================");
     println!("{}", first_block_header);
-
+    println!("=================================");
+    println!("{}", second_block_header);
+    println!("=================================");
+    println!("1st Block Hash: {}", first_block_header.get_block_header_sha256sum());
     println!("Size of Block Header: {}", std::mem::size_of::<BlockHeader>());
 
     let data: &str = "texto 1234";

@@ -16,14 +16,6 @@ pub fn read_mempool(path: &str){
     
     let tx = read_tx_from_file("/home/gabriel/projects/bitcoin-mining-challenge/mempool/0.json");
 
-    println!("================================");
-    println!("Transaction size = {}", tx.get_tx_size_in_bits());
-    println!("Input size = {}", tx.get_tx_input_vec_size_in_bits());
-    println!("Output size = {}", tx.get_tx_output_vec_size_in_bits());
-    println!("================================");
-
-    tx.tx_input[0].get_tx_input_size_in_bits();
-
     // for file in files{
     //     let file_path = path.to_string() + &file;
     //     // let file: File = File::create(&file_path).unwrap();
@@ -46,7 +38,7 @@ pub fn read_tx_from_file(file_path: &str) -> Tx {
     file.read_to_string(&mut file_content).expect("File can not be read");
     // let contents = fs::read_to_string(file_path)
             // .expect("Error while reading file");
-    let error_in_file_message:String = String::from("Error while parsing json to Tx in file ") + file_path.clone();
+    let error_in_file_message:String = String::from("Error while parsing json to Tx in file ") + file_path;
     
     let tx_in_json: Tx = serde_json::from_str(&file_content).expect(&error_in_file_message);
             // .expect("Error parsing file content to JSON");

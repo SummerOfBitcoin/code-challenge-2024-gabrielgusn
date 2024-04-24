@@ -42,8 +42,6 @@ impl Tx{
 
         let hash_string = result.iter().map(|byte| format!("{:02x}", byte)).collect::<String>();
 
-        println!("{}", serialized_tx);
-
         return hash_string;
     }
 

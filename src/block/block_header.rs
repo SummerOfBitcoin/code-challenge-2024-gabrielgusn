@@ -11,6 +11,7 @@
 use core::fmt;
 // chrono::... is being used for the `timestamp` value in the header
 use chrono::{DateTime, Utc};
+use sha2::{Sha256, Digest};
 
 /*  As we use ::fmt, we need the Debug trait in the struct and it can be automatically 
     implemented using derive()
@@ -32,16 +33,6 @@ pub struct BlockHeader {
 
 impl BlockHeader {
     pub fn new(block_id: String, txs_merkle_root: String, timestamp: DateTime<Utc>, nonce: u32) -> Self {
-        // I did not find a better way of representing the block id and merkle root other than
-        // String for now, so it uses the following control flows to avoid having "hashes" 
-        //different than 32 bytes.
-        if block_id.len() != 32 {
-            panic!("The block_id parameter needs to be a 32 bytes length string");
-        }
-        if txs_merkle_root.len() != 32 {
-            panic!("The txs_merkle_root parameter needs to be a 32 bytes length string");
-        }
-
         Self {
             block_id, 
             txs_merkle_root,
@@ -51,9 +42,19 @@ impl BlockHeader {
         }
     }
 
-    pub fn get_block_header_sha256sum() -> String{
-        String::from("Hello World")
+    pub fn get_block_header_sha256sum(&self) -> String{
+        let serialized_header = format!("{:?}", self);
+        let mut hasher = Sha256::new();
+
+        hasher.update(serialized_header.as_bytes());
+
+        let result = hasher.finalize();
+
+        let hash_string = result.iter().map(|byte| format!("{:02x}", byte)).collect::<String>();
+
+        return hash_string;
     }
+
 }
 
 impl fmt::Display for BlockHeader {
