@@ -26,66 +26,37 @@ pub fn read_mempool(path: &str){
         mempool.push(transaction);
     }
 
-    println!("Before sorting");
-    println!("Fee:{}", mempool[0].calculate_tx_fee());
-    println!("Fee:{}", mempool[1].calculate_tx_fee());
-    println!("Fee:{}", mempool[2].calculate_tx_fee());
+    let mut teste: String = String::from("teste");
+    teste.push('a');
 
-    mempool.sort_by_key(|tx| tx.calculate_tx_fee());
+    println!("teste eh {}", teste);
+
+    println!("Before sorting");
+    println!("Fee:{}", mempool[0].get_tx_fee());
+    println!("Fee:{}", mempool[1].get_tx_fee());
+    println!("Fee:{}", mempool[2].get_tx_fee());
+
+    mempool.sort_by_key(|tx| tx.get_tx_fee());
     mempool.reverse();
     println!("After sorting");
-    println!("Fee:{}", mempool[0].calculate_tx_fee());
-    println!("Fee:{}", mempool[1].calculate_tx_fee());
-    println!("Fee:{}", mempool[2].calculate_tx_fee());
+    println!("Fee:{}", mempool[0].get_tx_fee());
+    println!("Fee:{}", mempool[1].get_tx_fee());
+    println!("Fee:{}", mempool[2].get_tx_fee());
     // is_coinbase(tx_in_json);
 }
 
 pub fn read_tx_from_file(file_path: &str) -> Tx {
     let mut file_content: String = String::new();
     let path = Path::new(&file_path);
+
     let mut file = File::open(path).expect("Error while loading file");
     file.read_to_string(&mut file_content).expect("File can not be read");
-    // let contents = fs::read_to_string(file_path)
-            // .expect("Error while reading file");
+
     let error_in_file_message:String = String::from("Error while parsing json to Tx in file ") + file_path;
     
     let tx_in_json: Tx = serde_json::from_str(&file_content).expect(&error_in_file_message);
-            // .expect("Error parsing file content to JSON");
 
     return tx_in_json;
-}
-
-// TODO: this function is with a problem that all the strings are coming with "\".......\""
-// pub fn convert_json_tx_to_struct(tx_json: serde_json::Value) -> Tx {
-//     let tx_vin = &tx_json["vin"][0];
-//     let tx_vout = &tx_json["vout"][0];
- 
-//     let mut tx_input_vec: Vec<TxInput> = vec![];
-//     let mut tx_output_vec: Vec<TxOutput> = vec![];
-
-//     let tx_input: TxInput = TxInput::new(tx_vin["txid"].to_string(), tx_vin["prevout"]["value"].as_u64().expect("Error while casting tx_in value to u64"), tx_vin["scriptsig"].to_string(), tx_vin["is_coinbase"].as_bool().expect("Error while casting tx_in is_coinbase"));
-
-//     let tx_output: TxOutput = TxOutput::new(tx_vout["value"].as_u64().expect("Error while casting tx_out value to u64"), tx_vout["scriptpubkey"].to_string());
-
-//     tx_input_vec.push(tx_input);
-//     tx_output_vec.push(tx_output);
-
-//     Tx::new(tx_json["version"].as_u64().expect("Error while parsing tx version to u64") as u32, tx_input_vec, tx_output_vec)
-// }
-
-pub fn is_coinbase(tx: serde_json::Value) -> bool {
-    let tx_input = &tx["vin"];
-    if tx_input[0]["is_coinbase"].to_string() == "true"{
-        println!("{}", tx_input[0]["txid"]);
-    }
-    // println!("{}", type_name_of_val(&tx_input[0]["is_coinbase"]));
-    // println!("{}", tx_input); 
-    // println!("{:?}", tx_input[0]["is_coinbase"]);
-    // println!("{}", type_name_of_val(&tx));
-    // tx.as_array().map(
-    //     println!("{}", type_name_of_val(tx_input))
-    // );
-    return true
 }
 
 fn get_files_in_directory(path: &str) -> io::Result<Vec<String>> {
@@ -106,23 +77,3 @@ fn get_files_in_directory(path: &str) -> io::Result<Vec<String>> {
 
     Ok(file_names)
 }
-
-// THIS FUNCTION IS NOT WORKING
-// pub fn get_files_in_directory(dir_path: &str) -> io::Result<Vec<String>> {
-
-//     let entries = fs::read_dir(dir_path)
-//         .expect("Error while reading directory");
-
-//         let file_names: Vec<String> = entries
-//             .filter_map(|entry| {
-//                 let path = entry.ok()?.path();
-//                 if path.is_file() {
-//                     path.file_name()?.to_str().map(|s| s.to_owned())
-//                 } else {
-//                     None
-//                 }
-//         })
-//         .collect();
-    
-//         Ok(file_names);
-// }

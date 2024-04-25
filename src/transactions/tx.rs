@@ -32,7 +32,7 @@ impl Tx{
         }
     }
 
-    pub fn calculate_tx_fee(&self) -> u64 {
+    pub fn get_tx_fee(&self) -> u64 {
         let mut inputs_total: u64 = 0;
         let mut outputs_total: u64 = 0;
         
@@ -46,7 +46,7 @@ impl Tx{
         return inputs_total - outputs_total;
     }
 
-    pub fn get_tx_hash(&self) -> String{
+    pub fn get_tx_hash(&self) -> String {
         let serialized_tx = format!("{:?}", self);
         let mut hasher = Sha256::new();
 
@@ -101,7 +101,7 @@ pub struct TxInput{
 }
 
 impl TxInput{
-
+    
     pub fn new(txid: String,vout: u32,prevout: TxPrevOut,scriptsig: String,scriptsig_asm: String,witness: Vec<String>,is_coinbase: bool,sequence: u64,) -> Self{
         Self{
             txid,
@@ -114,15 +114,15 @@ impl TxInput{
             sequence,
         }
     }
-
+    
     pub fn get_tx_input_size_in_bits(&self) -> u64{
         let mut tx_input_size: u64 = 32 + 64 + 1;
-
+        
         let txid_size: u64 = self.txid.len() as u64 * 32;
         let prevout_size: u64 = self.prevout.get_prevout_size_in_bytes();
         let scriptsig_size: u64 = self.scriptsig.len() as u64 * 32;
         let scriptsig_asm_size: u64 = self.scriptsig_asm.len() as u64 * 32;
-
+        
         let mut witness_size: u64 = match self.witness.clone() {
             Some(witness_vec) => {
                 let mut witness_vec_strings_size: u64 = 0;
@@ -133,10 +133,14 @@ impl TxInput{
             },
             None => 0
         };
-
+        
         tx_input_size += txid_size + prevout_size + scriptsig_size + scriptsig_asm_size + witness_size;
-
+        
         return tx_input_size;
+    }
+    
+    pub fn is_coinbase(&self) -> bool {
+        self.is_coinbase
     }
 }
 

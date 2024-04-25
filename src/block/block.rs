@@ -1,7 +1,7 @@
 #![allow(dead_code, unused)]
 
-use super::block_header::{self, BlockHeader};
-use crate::transactions::{self, tx::Tx};
+use super::block_header::BlockHeader;
+use crate::transactions::tx::Tx;
 use core::fmt;
 #[derive(Debug)]
 pub struct Block{
@@ -19,8 +19,8 @@ impl Block {
         }
     }
 
-    fn get_block_header_hash() -> String {
-    String::from("Hello World!")
+    fn get_block_header_hash(&self) -> String {
+        self.block_header.get_block_header_sha256sum()
     }
 
     pub fn get_block_size(&self) -> u64 {
@@ -35,7 +35,7 @@ impl Block {
     pub fn proof_of_work(&mut self){
     loop {
         if self.block_header.get_block_header_sha256sum() < self.block_header.target_hash {
-            println!("\tFound the nonce for the target Hash! It is: {} and you can attach this block to the blockchain\n\t Block Hash is: {}", self.block_header.nonce, self.block_header.get_block_header_sha256sum());
+            println!("\tFound the nonce for the target Hash! It is: {} and you can attach this block to the blockchain\n\t Block Hash is: {}\n", self.block_header.nonce, self.block_header.get_block_header_sha256sum());
             break
         }
         // println!("Not yet! ({})", self.block_header.get_block_header_sha256sum());
