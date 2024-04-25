@@ -1,12 +1,11 @@
 #![allow(dead_code, unused)]
 // use ring::digest;
 
-use core::hash;
-
+use core::{hash, fmt};
 use sha2::{Digest, Sha256, Sha256VarCore};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Tx{
     pub version: u32,
     pub locktime: u32,
@@ -30,6 +29,10 @@ impl Tx{
             tx_input: vin,
             tx_output: vout,
         }
+    }
+
+    pub fn get_tx_fee_per_bit(&self) -> f64 {
+        self.get_tx_fee() as f64 / self.get_tx_size_in_bits() as f64
     }
 
     pub fn get_tx_fee(&self) -> u64 {
@@ -88,7 +91,7 @@ impl Tx{
     
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TxInput{
     pub txid: String,
     pub vout: u32,
@@ -144,7 +147,7 @@ impl TxInput{
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TxPrevOut{
     pub scriptpubkey: String,
     pub scriptpubkey_asm: String,
@@ -168,7 +171,7 @@ impl TxPrevOut{
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TxOutput {
     pub scriptpubkey: String,
     pub scriptpubkey_asm: String,
@@ -201,5 +204,21 @@ impl TxOutput{
         
         tx_output_size += scriptpubkey_size + scriptpubkey_asm_size + scriptpubkey_type_size + scriptpubkey_address_size;
         return tx_output_size;
+    }
+}
+
+impl fmt::Display for Tx{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,
+            "Tx {}
+            Tx Fee: {}
+            Tx Size: {}
+            Tx sat/bit: {}\n",
+            self.get_tx_hash(),
+            self.get_tx_fee(),
+            self.get_tx_size_in_bits(),
+            self.get_tx_fee_per_bit()
+            // self.default_tx
+        )
     }
 }

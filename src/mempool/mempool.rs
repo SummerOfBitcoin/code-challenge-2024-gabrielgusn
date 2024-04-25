@@ -1,52 +1,43 @@
 
 #![allow(dead_code, unused)]
 
+use std::fmt::Formatter;
+use core::fmt;
 use crate::transactions::tx::Tx;
-use mining_challenge::{get_files_in_directory};
+use crate::{get_files_in_directory, read_tx_from_file};
 
+#[derive(Debug)]
 pub struct Mempool {
-    mempool_txs: Vec<MempoolTx>,    
+    pub txs: Vec<Tx>,    
 }
 
 impl Mempool{
-    pub fn new(mempool_txs: Vec<MempoolTx>) -> Self {
+    pub fn new() -> Self {
+        let mempool_txs: Vec<Tx> = vec![];
         Self {
-            mempool_txs,
+            txs: mempool_txs,
         }
     }
     
-}
-
-pub fn get_mempool_from_dir(dir_path: &str) -> Mempool {
-    let files: Vec<String> = get_files_in_directory(dir_path).expect("Error while reading mempool directory");
-
-    let mut mempool: Vec<MempoolTx> = vec![];
-
-    for file in files{
-        let file_path = path.to_string() + &file;
-
-        let transaction: Tx = read_tx_from_file(&file_path);
-
-        let mempool_tx: MempoolTx = MempoolTx::new(transaction);
-
-        mempool.push(mempool_tx);
-    }
-
-    return mempool;
-}
-
-struct MempoolTx {
-    default_tx: Tx,
-    tx_size: u64,
-    tx_fee: u64,
-}
-
-impl MempoolTx{
-    pub fn new(tx: Tx) -> Self {
-        Self {
-            default_tx,
-            tx_size: tx.get_tx_size_in_bits(),
-            tx_fee: tx.get_tx_fee(),
+    pub fn get_mempool_from_dir(dir_path: &str) -> Mempool {
+        let files: Vec<String> = get_files_in_directory(dir_path).expect("Error while reading mempool directory");
+        
+        let mut mempool: Mempool = Mempool::new();
+        
+        for file in files{
+            let file_path = dir_path.to_string() + &file;
+            
+            let tx: Tx = read_tx_from_file(&file_path);
+                        
+            mempool.txs.push(tx);
         }
+        
+        return mempool;
     }
+
+    pub fn sort_mempool_by_tx(&mut self) {
+        self.txs.sort_by(|a, b| a.get_tx_fee_per_bit().partial_cmp(&b.get_tx_fee_per_bit()).unwrap());
+        self.txs.reverse();
+    }
+    
 }

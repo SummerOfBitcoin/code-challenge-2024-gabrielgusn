@@ -30,21 +30,21 @@ fn main() {
 
     block_vec.push(block);
 
-    for i in 0..10{
+    // for i in 0..10{
 
-        println!("Generating Block {}", i+1);
+    //     println!("Generating Block {}", i+1);
 
-        let block_header = BlockHeader::new(block_vec[i].block_header.get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 0);
+    //     let block_header = BlockHeader::new(block_vec[i].block_header.get_block_header_sha256sum(), String::from("00000000000000000000000000000000"), Utc::now(), 0);
 
-        let new_block = Block::new(block_header, vec![]);
-        block_vec.push(new_block);
-    }
+    //     let new_block = Block::new(block_header, vec![]);
+    //     block_vec.push(new_block);
+    // }
 
 
-    for mut block in block_vec {
-        println!("{}", block);
-        block.proof_of_work()
-    }
+    // for mut block in block_vec {
+    //     println!("{}", block);
+    //     block.proof_of_work()
+    // }
 
     // for mut block in block_veu ec{
         
