@@ -31,8 +31,28 @@ impl Tx{
         }
     }
 
-    pub fn get_tx_fee_per_bit(&self) -> f64 {
-        self.get_tx_fee() as f64 / self.get_tx_size_in_bits() as f64
+    pub fn get_tx_output_value(&self) -> u64 {
+        let mut output_value: u64 = 0;
+
+        for tx_out in &self.tx_output{
+            output_value += tx_out.value;
+        }
+
+        return output_value;
+    }
+
+    pub fn get_tx_input_value(&self) -> u64{
+        let mut input_value: u64 = 0;
+
+        for tx_in in &self.tx_input{
+            input_value += tx_in.prevout.value;
+        }
+
+        return input_value;
+    }
+
+    pub fn get_tx_fee_per_bit(&self) -> f32 {
+        self.get_tx_fee() as f32 / self.get_tx_size_in_bits() as f32
     }
 
     pub fn get_tx_fee(&self) -> u64 {
@@ -62,31 +82,36 @@ impl Tx{
         return hash_string;
     }
 
-    pub fn get_tx_size_in_bits(&self) -> u64 {
+    pub fn get_tx_size_in_bits(&self) -> u32 {
         // initial value for tx_size because every transaction will have at least 64 bits
-        let mut tx_size: u64 = 32 + 32;
+        let mut tx_size: u32 = 32 + 32;
 
         tx_size += self.get_tx_input_vec_size_in_bits() + self.get_tx_output_vec_size_in_bits();
 
         return tx_size;
     }
 
-    pub fn get_tx_input_vec_size_in_bits(&self) -> u64 {
-        let mut input_size: u64 = 0;
+    pub fn get_tx_input_vec_size_in_bits(&self) -> u32 {
+        let mut input_size: u32 = 0;
         
         for input in &self.tx_input {
             input_size += input.get_tx_input_size_in_bits();
         }
         return input_size;
     }
-    pub fn get_tx_output_vec_size_in_bits(&self) -> u64 {
-        let mut output_size: u64 = 0;
+    pub fn get_tx_output_vec_size_in_bits(&self) -> u32 {
+        let mut output_size: u32 = 0;
         
         for output in &self.tx_output {
             output_size += output.get_tx_output_size_in_bits();
         }
 
         return output_size;
+    }
+
+    pub fn pre_validate_tx(&self) -> bool {
+
+        true || false
     }
     
 }
@@ -118,19 +143,19 @@ impl TxInput{
         }
     }
     
-    pub fn get_tx_input_size_in_bits(&self) -> u64{
-        let mut tx_input_size: u64 = 32 + 64 + 1;
+    pub fn get_tx_input_size_in_bits(&self) -> u32{
+        let mut tx_input_size: u32 = 32 + 64 + 1;
         
-        let txid_size: u64 = self.txid.len() as u64 * 32;
-        let prevout_size: u64 = self.prevout.get_prevout_size_in_bytes();
-        let scriptsig_size: u64 = self.scriptsig.len() as u64 * 32;
-        let scriptsig_asm_size: u64 = self.scriptsig_asm.len() as u64 * 32;
+        let txid_size: u32 = self.txid.len() as u32 * 32;
+        let prevout_size: u32 = self.prevout.get_prevout_size_in_bytes();
+        let scriptsig_size: u32 = self.scriptsig.len() as u32 * 32;
+        let scriptsig_asm_size: u32 = self.scriptsig_asm.len() as u32 * 32;
         
-        let mut witness_size: u64 = match self.witness.clone() {
+        let mut witness_size: u32 = match self.witness.clone() {
             Some(witness_vec) => {
-                let mut witness_vec_strings_size: u64 = 0;
+                let mut witness_vec_strings_size: u32 = 0;
                 for witness_item in witness_vec {
-                    witness_vec_strings_size += witness_item.len() as u64 * 32;
+                    witness_vec_strings_size += witness_item.len() as u32 * 32;
                 }
                 witness_vec_strings_size
             },
@@ -157,13 +182,13 @@ pub struct TxPrevOut{
 }
 
 impl TxPrevOut{
-    pub fn get_prevout_size_in_bytes(&self) -> u64{
-        let mut prevout_size: u64 = 64;
+    pub fn get_prevout_size_in_bytes(&self) -> u32{
+        let mut prevout_size: u32 = 64;
 
-        let scriptpubkey_size: u64 = self.scriptpubkey.len() as u64 * 32;
-        let scriptpubkey_asm_size: u64 = self.scriptpubkey_asm.len() as u64 * 32;
-        let scriptpubkey_type_size: u64 = self.scriptpubkey_type.len() as u64 * 32;
-        let scriptpubkey_address_size: u64 = self.scriptpubkey_address.len() as u64 * 32;
+        let scriptpubkey_size: u32 = self.scriptpubkey.len() as u32 * 32;
+        let scriptpubkey_asm_size: u32 = self.scriptpubkey_asm.len() as u32 * 32;
+        let scriptpubkey_type_size: u32 = self.scriptpubkey_type.len() as u32 * 32;
+        let scriptpubkey_address_size: u32 = self.scriptpubkey_address.len() as u32 * 32;
 
         prevout_size += scriptpubkey_size + scriptpubkey_asm_size + scriptpubkey_type_size + scriptpubkey_address_size;
 
@@ -192,13 +217,13 @@ impl TxOutput{
         }
     }
 
-    pub fn get_tx_output_size_in_bits(&self) -> u64{
-        let mut tx_output_size: u64 = 64;
-        let scriptpubkey_size: u64 = self.scriptpubkey.len() as u64 * 32;
-        let scriptpubkey_asm_size: u64 = self.scriptpubkey_asm.len() as u64 * 32;
-        let scriptpubkey_type_size: u64 = self.scriptpubkey_type.len() as u64 * 32;
-        let scriptpubkey_address_size: u64 = match &self.scriptpubkey_address {
-            Some(scriptpubkey_address) => scriptpubkey_address.len() as u64 * 32,
+    pub fn get_tx_output_size_in_bits(&self) -> u32{
+        let mut tx_output_size: u32 = 64;
+        let scriptpubkey_size: u32 = self.scriptpubkey.len() as u32 * 32;
+        let scriptpubkey_asm_size: u32 = self.scriptpubkey_asm.len() as u32 * 32;
+        let scriptpubkey_type_size: u32 = self.scriptpubkey_type.len() as u32 * 32;
+        let scriptpubkey_address_size: u32 = match &self.scriptpubkey_address {
+            Some(scriptpubkey_address) => scriptpubkey_address.len() as u32 * 32,
             None => 0
         };
         
@@ -210,15 +235,13 @@ impl TxOutput{
 impl fmt::Display for Tx{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f,
-            "Tx {}
-            Tx Fee: {}
-            Tx Size: {}
-            Tx sat/bit: {}\n",
+            "Tx {}\n\tTx Fee: {}\n\tTx Size: {}\n\tTx sat/bit: {}\n\t\t Total Input: {}\n\t\t Total Output: {}\n",
             self.get_tx_hash(),
             self.get_tx_fee(),
             self.get_tx_size_in_bits(),
-            self.get_tx_fee_per_bit()
-            // self.default_tx
+            self.get_tx_fee_per_bit(),
+            self.get_tx_input_value(),
+            self.get_tx_output_value()
         )
     }
 }

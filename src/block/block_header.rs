@@ -16,7 +16,7 @@ use sha2::{Sha256, Digest};
 /*  As we use ::fmt, we need the Debug trait in the struct and it can be automatically 
     implemented using derive()
 */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BlockHeader {
     // block_id is intended to store the sha256 hash of the previous block's header, as in bitcoin
     pub block_id: String, //[u8; 32],
@@ -40,6 +40,17 @@ impl BlockHeader {
             timestamp,
             nonce
         }
+    }
+
+    pub fn get_block_header_size(&self) -> u32 {
+        let mut header_size: u32 = 32;
+        let txs_merkle_root_size: u32 = self.txs_merkle_root.len() as u32 * 32;
+        let target_hash_size: u32 = self.target_hash.len() as u32 * 32;
+        let timestamp_size: u32 = self.timestamp.to_string().len() as u32 * 32;
+
+        header_size = txs_merkle_root_size + target_hash_size + timestamp_size;
+
+        return header_size;
     }
 
     pub fn get_block_header_sha256sum(&self) -> String{
