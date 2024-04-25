@@ -4,7 +4,8 @@
 use std::fmt::Formatter;
 use core::fmt;
 use crate::transactions::tx::Tx;
-use crate::{get_files_in_directory, read_tx_from_file};
+use crate::utils::{read_tx_from_file, get_files_in_directory};
+// use crate::get_files_in_directory;
 
 #[derive(Debug)]
 pub struct Mempool {
@@ -20,16 +21,18 @@ impl Mempool{
     }
     
     pub fn get_mempool_from_dir(dir_path: &str) -> Mempool {
-        let files: Vec<String> = get_files_in_directory(dir_path).expect("Error while reading mempool directory");
+        let files: Vec<String> = get_files_in_directory(&dir_path).expect("Error while reading mempool directory");
         
         let mut mempool: Mempool = Mempool::new();
         
-        for file in files{
-            let file_path = dir_path.to_string() + &file;
-            
+        for file  in files{
+
+            let file_path: String = dir_path.to_string() + &file;
             let tx: Tx = read_tx_from_file(&file_path);
-                        
-            mempool.txs.push(tx);
+
+            if tx.pre_validate_tx() {
+                mempool.txs.push(tx);
+            }
         }
         
         return mempool;

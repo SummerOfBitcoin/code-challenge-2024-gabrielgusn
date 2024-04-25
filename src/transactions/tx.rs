@@ -1,6 +1,7 @@
 #![allow(dead_code, unused)]
 // use ring::digest;
 
+
 use core::{hash, fmt};
 use sha2::{Digest, Sha256, Sha256VarCore};
 use serde::{Deserialize, Serialize};
@@ -110,8 +111,19 @@ impl Tx{
     }
 
     pub fn pre_validate_tx(&self) -> bool {
+        let mut tx_validity: bool = true;
 
-        true || false
+        if self.get_tx_input_value() < self.get_tx_output_value(){
+            tx_validity = false
+        }
+
+        for output in &self.tx_output{
+            if output.scriptpubkey_type == "unknown" {
+                tx_validity = false
+            }
+        }
+
+        return tx_validity;
     }
     
 }

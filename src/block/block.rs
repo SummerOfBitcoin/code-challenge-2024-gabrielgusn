@@ -1,8 +1,11 @@
 #![allow(dead_code, unused)]
 
 use super::block_header::BlockHeader;
-use crate::transactions::tx::Tx;
+use crate::transactions::{self, tx::Tx};
 use core::fmt;
+
+const BLOCK_MAX_SIZE: u32 = 8000000;
+
 #[derive(Debug)]
 pub struct Block{
     pub block_header: BlockHeader,
@@ -16,12 +19,32 @@ impl Block {
         Self{
             block_header: block_header.clone(),
             transactions,
-            block_size: block_header.get_block_header_size(),
+            block_size: block_header.get_block_header_size() + 32,
         }
     }
 
-    pub fn get_block_header_size(){
+    pub fn calculate_total_block_fee(&self) -> u64 {
+        let mut total_fee: u64 = 0;
 
+        for tx in &self.transactions{
+            total_fee += tx.get_tx_fee();
+        }
+
+        return total_fee;
+    }
+
+    pub fn get_block_size_left(&self) -> u32 {
+        BLOCK_MAX_SIZE - self.block_size
+    }
+
+    pub fn push_transaction(&mut self, tx: Tx) {
+        if self.block_size + tx.get_tx_size_in_bits() <= BLOCK_MAX_SIZE {
+            self.block_size += tx.get_tx_size_in_bits();
+            self.transactions.push(tx);
+        }
+        else {
+            println!("It is not possible to attach this tx to the block\n\tThe Tx Size is {} and the remaining space in the block is {}", tx.get_tx_size_in_bits(), self.block_size);
+        }
     }
 
     fn get_block_header_hash(&self) -> String {
@@ -54,12 +77,15 @@ impl fmt::Display for Block {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {        
         write!(
             f,
-            "Block ID: {}\nMerkle Root: {}\nTimestamp: {}\nNonce: {}\n\tTransactions: {:?}",
+            "Block ID: {}\nMerkle Root: {}\nTimestamp: {}\nNonce: {}\n\tAmount of Transactions: {:?}\n\tTotal Fee: {}\n\tBlock Size in KB: {} KBs\n\tBlock Size in Bits: {} Bits",
             self.block_header.block_id,
             self.block_header.txs_merkle_root,
             self.block_header.timestamp,
             self.block_header.nonce,
-            self.transactions,
+            self.transactions.len(),
+            self.calculate_total_block_fee(),
+            (self.get_block_size() / 8 / 1000),
+            self.get_block_size()
         )
     }
 }
