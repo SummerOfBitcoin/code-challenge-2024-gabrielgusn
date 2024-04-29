@@ -1,7 +1,9 @@
 #![allow(dead_code, unused)]
 
+use merkletree::merkle::MerkleTree;
 use super::block_header::BlockHeader;
-use crate::{mempool::mempool::Mempool, transactions::{self, tx::Tx}};
+use crate::mempool::mempool::Mempool;
+use crate::transactions::tx::Tx;
 use core::fmt;
 
 const BLOCK_MAX_SIZE: u32 = 8000000;
@@ -20,6 +22,17 @@ impl Block {
             block_header: block_header.clone(),
             transactions,
             block_size: block_header.get_block_header_size() + 32,
+        }
+    }
+
+    pub fn get_merkle_root_from_txs_vec(txs: Vec<Tx>) -> String {
+        // let merkletree = MerkleTree::;
+        String::new()
+    }
+
+    pub fn insert_transactions_from_vec(&mut self, txs_vec: Vec<Tx>){
+        for tx in txs_vec{
+            self.push_transaction(tx);
         }
     }
 

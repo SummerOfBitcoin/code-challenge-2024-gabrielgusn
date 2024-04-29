@@ -165,31 +165,17 @@ pub fn hash_160(value: &String) -> String {
 
 pub fn read_mempool(path: &str) -> Mempool {
 
-    // let files = get_files_in_directory(path)
-    //     .expect("Error while reading Dir");
-    
-    // let tx = read_tx_from_file("/home/gabriel/projects/bitcoin-mining-challenge/mempool/0.json");
-
     let mut mempool: Mempool = Mempool::get_mempool_from_dir(path);
 
-    // println!("{:?}", mempool);
-
-    // println!("==================== Before sorting ====================");
-    // for i in 0..100{
-    //     println!("{}", mempool.txs[i]);
-    // }
-
-    // println!("==================== After sorting ====================");
-    // mempool.sort_mempool_by_tx();
-    // for i in 0..100{
-    //     println!("{}", mempool.txs[i]);
-    // }
     mempool
 }
 
 pub fn get_files_in_directory(path: &str) -> io::Result<Vec<String>> {
     // Get a list of all entries in the folder
-    let entries = fs::read_dir(path)?;
+    let dir_path = Path::new(path);
+    println!("{:?}", dir_path);
+
+    let entries = fs::read_dir(dir_path)?;
     
     // Extract the filenames from the directory entries and store them in a vector
     let file_names: Vec<String> = entries

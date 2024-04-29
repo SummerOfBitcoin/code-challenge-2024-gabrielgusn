@@ -25,7 +25,7 @@ jobs:
         uses: SummerOfBitcoin/code-challenge-2024-grader@v2.8
         with:
           test-name: 'Validate block '
-          command: chmod +x ./run.sh && ./run.sh
+          command: chmod +x ./run.sh && ./run.sh && ls && cat output.txt
           timeout: 10
           max-fee: 20616923
           max-score: 100
