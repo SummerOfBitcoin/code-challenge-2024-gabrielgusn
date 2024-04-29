@@ -1,12 +1,12 @@
 #![allow(dead_code, unused)]
 
 use super::block_header::BlockHeader;
-use crate::transactions::{self, tx::Tx};
+use crate::{mempool::mempool::Mempool, transactions::{self, tx::Tx}};
 use core::fmt;
 
 const BLOCK_MAX_SIZE: u32 = 8000000;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Block{
     pub block_header: BlockHeader,
     pub transactions: Vec<Tx>,
@@ -20,6 +20,20 @@ impl Block {
             block_header: block_header.clone(),
             transactions,
             block_size: block_header.get_block_header_size() + 32,
+        }
+    }
+
+    pub fn insert_transactions_from_mempool(&mut self, mempool: &mut Mempool) {
+        loop {
+            if mempool.txs.len() > 0{
+                if mempool.txs.last().unwrap().get_tx_size_in_bits() < self.get_block_size_left(){
+                    self.push_transaction(mempool.txs.pop().unwrap());
+                    println!("Txs Left on Mempool: {}", mempool.txs.len());
+                }
+                else {
+                    break;
+                }        
+            }
         }
     }
 

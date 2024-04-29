@@ -78,7 +78,7 @@ impl Tx{
 
         let result = hasher.finalize();
 
-        let hash_string = result.iter().map(|byte| format!("{:02x}", byte)).collect::<String>();
+        let hash_string: String = result.iter().map(|byte| format!("{:02x}", byte)).collect::<String>();
 
         return hash_string;
     }

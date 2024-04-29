@@ -40,7 +40,6 @@ impl Mempool{
 
     pub fn sort_mempool_by_tx(&mut self) {
         self.txs.sort_by(|a, b| a.get_tx_fee_per_bit().partial_cmp(&b.get_tx_fee_per_bit()).unwrap());
-        self.txs.reverse();
     }
     
 }
